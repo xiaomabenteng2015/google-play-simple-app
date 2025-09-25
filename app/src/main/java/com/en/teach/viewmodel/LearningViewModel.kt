@@ -35,9 +35,21 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
     fun setReviewMode(isReview: Boolean) {
         reviewMode = isReview
         currentWordsList = if (isReview) {
-            repository.getWordsForReview().toMutableList()
+            val reviewWords = repository.getWordsForReview().toMutableList()
+            // 如果没有需要复习的单词，使用已学习的单词进行复习
+            if (reviewWords.isEmpty()) {
+                repository.getLearnedWords().take(10).toMutableList()
+            } else {
+                reviewWords
+            }
         } else {
-            repository.getUnlearnedWords().toMutableList()
+            val unlearnedWords = repository.getUnlearnedWords()
+            // 如果没有未学习的单词，提示用户
+            if (unlearnedWords.isEmpty()) {
+                mutableListOf() // 返回空列表，会触发完成
+            } else {
+                unlearnedWords.take(10).toMutableList() // 限制每次学习10个单词
+            }
         }
         currentWordsList.shuffle()
         
@@ -68,16 +80,25 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
             currentSession?.wordsStudied = (currentSession?.wordsStudied ?: 0) + 1
             
             if (!reviewMode) {
-                // 根据当前的正确率调整难度级别
+                // 学习模式：根据当前的正确率调整难度级别
                 val difficulty = calculateDifficultyLevel(word)
                 repository.markWordAsLearned(word.id, difficulty)
             } else {
-                // 复习模式：根据表现调整难度
+                // 复习模式：根据表现调整难度，连续正确可以升级
                 val newDifficulty = when (word.difficultyLevel) {
+                    DifficultyLevel.UNKNOWN -> DifficultyLevel.MEDIUM
                     DifficultyLevel.HARD -> DifficultyLevel.MEDIUM
                     DifficultyLevel.MEDIUM -> DifficultyLevel.EASY
-                    DifficultyLevel.EASY -> DifficultyLevel.MASTERED
-                    else -> DifficultyLevel.EASY
+                    DifficultyLevel.EASY -> {
+                        // 检查是否可以升级为MASTERED
+                        // 条件：在复习中连续答对，且总体表现良好
+                        if (word.correctAnswers >= 2 && word.correctAnswers >= word.incorrectAnswers * 2) {
+                            DifficultyLevel.MASTERED
+                        } else {
+                            DifficultyLevel.EASY
+                        }
+                    }
+                    DifficultyLevel.MASTERED -> DifficultyLevel.MASTERED
                 }
                 repository.markWordAsLearned(word.id, newDifficulty)
             }
@@ -138,17 +159,67 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
     
     private fun finishSession() {
         currentSession?.let { session ->
+            session.endTime = System.currentTimeMillis()
             statsManager.endLearningSession(session)
             
             // 更新repository中的学习进度
             val wordsLearned = if (!reviewMode) session.correctAnswers else 0
             val reviewsCompleted = if (reviewMode) session.wordsStudied else 0
-            val studyTime = System.currentTimeMillis() - session.startTime
+            val studyTime = session.endTime - session.startTime
             
             repository.updateLearningProgress(wordsLearned, reviewsCompleted, studyTime)
+            
+            // 更新今日学习进度，确保连续天数正确计算
+            val preferencesManager = com.en.teach.data.PreferencesManager(getApplication())
+            
+            // 如果有学习活动，更新今日学习日期和连续天数
+            if (wordsLearned > 0 || reviewsCompleted > 0) {
+                val progress = preferencesManager.loadLearningProgress()
+                val today = preferencesManager.getTodayDateString()
+                
+                // 如果今天还没有学习记录，更新连续天数
+                if (progress.lastStudyDate != today) {
+                    // 检查是否是连续的一天
+                    if (progress.lastStudyDate.isNotEmpty()) {
+                        val isConsecutive = isConsecutiveDay(progress.lastStudyDate, today)
+                        if (isConsecutive) {
+                            progress.currentStreak++
+                        } else {
+                            progress.currentStreak = 1
+                        }
+                    } else {
+                        progress.currentStreak = 1
+                    }
+                    
+                    // 更新最长连续天数
+                    if (progress.currentStreak > progress.longestStreak) {
+                        progress.longestStreak = progress.currentStreak
+                    }
+                    
+                    progress.lastStudyDate = today
+                    preferencesManager.saveLearningProgress(progress)
+                }
+            }
         }
         
         _isFinished.value = true
+    }
+    
+    private fun isConsecutiveDay(lastDate: String, currentDate: String): Boolean {
+        try {
+            val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            val lastDateObj = dateFormat.parse(lastDate)
+            val currentDateObj = dateFormat.parse(currentDate)
+            
+            if (lastDateObj != null && currentDateObj != null) {
+                val diffInMillis = currentDateObj.time - lastDateObj.time
+                val diffInDays = diffInMillis / (24 * 60 * 60 * 1000)
+                return diffInDays == 1L
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
     }
     
     override fun onCleared() {

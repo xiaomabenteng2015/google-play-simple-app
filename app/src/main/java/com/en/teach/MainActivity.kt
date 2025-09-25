@@ -2,6 +2,7 @@ package com.en.teach
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.en.teach.databinding.ActivityMainBinding
@@ -12,6 +13,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     
+    // 使用现代的 Activity Result API
+    private val learningLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // 学习完成后，强制刷新数据
+        android.util.Log.d("MainActivity", "Learning activity finished, refreshing data")
+        viewModel.refreshData()
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -21,11 +31,19 @@ class MainActivity : AppCompatActivity() {
         
         setupUI()
         observeViewModel()
+        
+        // 初始化一些测试数据（仅在第一次运行时）
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        if (!prefs.getBoolean("test_data_initialized", false)) {
+            viewModel.initializeTestData()
+            prefs.edit().putBoolean("test_data_initialized", true).apply()
+        }
     }
     
     private fun setupUI() {
         binding.btnStartLearning.setOnClickListener {
-            startActivity(Intent(this, LearningActivity::class.java))
+            val intent = Intent(this, LearningActivity::class.java)
+            learningLauncher.launch(intent)
         }
         
         binding.btnWordList.setOnClickListener {
@@ -33,9 +51,16 @@ class MainActivity : AppCompatActivity() {
         }
         
         binding.btnReview.setOnClickListener {
-            val intent = Intent(this, LearningActivity::class.java)
-            intent.putExtra("review_mode", true)
-            startActivity(intent)
+            // 检查是否有需要复习的单词
+            val reviewCount = viewModel.wordsForReview.value ?: 0
+            if (reviewCount > 0) {
+                val intent = Intent(this, LearningActivity::class.java)
+                intent.putExtra("review_mode", true)
+                learningLauncher.launch(intent)
+            } else {
+                // 显示提示信息
+                android.widget.Toast.makeText(this, "暂时没有需要复习的单词", android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
     }
     
@@ -74,6 +99,10 @@ class MainActivity : AppCompatActivity() {
     
     override fun onResume() {
         super.onResume()
+        // 每次回到主界面都刷新数据
+        android.util.Log.d("MainActivity", "onResume - refreshing data")
         viewModel.refreshData()
     }
+    
+
 }

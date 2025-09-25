@@ -137,19 +137,24 @@ class PreferencesManager(context: Context) {
         val today = getTodayDateString()
         
         if (progress.lastStudyDate != today) {
-            // 新的一天，重置每日进度
-            progress.lastStudyDate = today
+            val previousDate = progress.lastStudyDate
             
             // 更新连续学习天数
-            if (isConsecutiveDay(progress.lastStudyDate, today)) {
+            if (previousDate.isNotEmpty() && isConsecutiveDay(previousDate, today)) {
                 progress.currentStreak++
                 if (progress.currentStreak > progress.longestStreak) {
                     progress.longestStreak = progress.currentStreak
                 }
+            } else if (previousDate.isNotEmpty()) {
+                // 不是连续的天数，重置为1
+                progress.currentStreak = 1
             } else {
+                // 第一次使用应用
                 progress.currentStreak = 1
             }
             
+            // 新的一天，重置每日进度
+            progress.lastStudyDate = today
             progress.wordsLearnedToday = 0
             progress.reviewsCompletedToday = 0
             saveLearningProgress(progress)

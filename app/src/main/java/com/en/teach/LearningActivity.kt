@@ -29,6 +29,8 @@ class LearningActivity : AppCompatActivity() {
     
     private fun setupUI() {
         binding.toolbar.setNavigationOnClickListener {
+            // 即使用户手动返回，也要通知数据可能已更新
+            setResult(RESULT_OK)
             finish()
         }
         
@@ -76,6 +78,8 @@ class LearningActivity : AppCompatActivity() {
         
         viewModel.isFinished.observe(this) { finished ->
             if (finished) {
+                // 设置结果，通知MainActivity数据已更新
+                setResult(RESULT_OK)
                 finish()
             }
         }
