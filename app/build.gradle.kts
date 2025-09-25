@@ -78,6 +78,9 @@ dependencies {
     // CardView
     implementation("androidx.cardview:cardview:1.0.0")
 
+    // Gson for JSON serialization
+    implementation("com.google.code.gson:gson:2.10.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

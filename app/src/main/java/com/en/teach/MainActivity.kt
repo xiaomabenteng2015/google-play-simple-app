@@ -52,6 +52,24 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.progress = progress
             binding.tvProgress.text = getString(R.string.progress_complete, progress)
         }
+        
+        // 新增的统计信息观察
+        viewModel.masteredWords.observe(this) { mastered ->
+            binding.tvMasteredWords?.text = mastered.toString()
+        }
+        
+        viewModel.currentStreak.observe(this) { streak ->
+            binding.tvCurrentStreak?.text = streak.toString()
+        }
+        
+        viewModel.wordsForReview.observe(this) { reviewCount ->
+            // 更新复习按钮的文字，显示需要复习的单词数
+            if (reviewCount > 0) {
+                binding.btnReview.text = "复习 ($reviewCount)"
+            } else {
+                binding.btnReview.text = getString(R.string.review_learned)
+            }
+        }
     }
     
     override fun onResume() {

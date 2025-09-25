@@ -1,14 +1,15 @@
 package com.en.teach.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.en.teach.data.WordRepository
 import com.en.teach.model.Word
 
-class WordListViewModel : ViewModel() {
+class WordListViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val repository = WordRepository()
+    private val repository = WordRepository(application)
     
     private val _words = MutableLiveData<List<Word>>()
     val words: LiveData<List<Word>> = _words

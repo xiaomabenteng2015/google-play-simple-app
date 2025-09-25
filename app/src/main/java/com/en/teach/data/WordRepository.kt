@@ -1,13 +1,30 @@
 package com.en.teach.data
 
-import com.en.teach.model.Word
+import android.content.Context
+import com.en.teach.model.*
 
-class WordRepository {
+class WordRepository(private val context: Context) {
     
     private val words = mutableListOf<Word>()
+    private val preferencesManager = PreferencesManager(context)
     
     init {
-        initializeWords()
+        loadWords()
+    }
+    
+    private fun loadWords() {
+        val savedWords = preferencesManager.loadWords()
+        if (savedWords != null && savedWords.isNotEmpty()) {
+            words.clear()
+            words.addAll(savedWords)
+        } else {
+            initializeWords()
+            saveWords()
+        }
+    }
+    
+    private fun saveWords() {
+        preferencesManager.saveWords(words)
     }
     
     private fun initializeWords() {
@@ -145,4 +162,107 @@ class WordRepository {
     }
     
     fun getWordById(id: Int): Word? = words.find { it.id == id }
+    
+    // ========== 新增的功能方法 ==========
+    
+    // 获取需要复习的单词（基于间隔重复算法）
+    fun getWordsForReview(): List<Word> {
+        val currentTime = System.currentTimeMillis()
+        return words.filter { word ->
+            word.isLearned && (word.nextReviewTime == 0L || word.nextReviewTime <= currentTime)
+        }
+    }
+    
+    // 标记单词为已学会并设置下次复习时间
+    fun markWordAsLearned(wordId: Int, difficulty: DifficultyLevel = DifficultyLevel.MEDIUM) {
+        words.find { it.id == wordId }?.let { word ->
+            val currentTime = System.currentTimeMillis()
+            
+            if (!word.isLearned) {
+                word.isLearned = true
+                word.firstLearnedTime = currentTime
+            }
+            
+            word.reviewCount++
+            word.lastReviewTime = currentTime
+            word.difficultyLevel = difficulty
+            word.correctAnswers++
+            
+            // 更新下次复习时间（间隔重复算法）
+            word.nextReviewTime = calculateNextReviewTime(word)
+            
+            saveWords()
+        }
+    }
+    
+    // 标记单词回答错误
+    fun markWordAsIncorrect(wordId: Int) {
+        words.find { it.id == wordId }?.let { word ->
+            word.incorrectAnswers++
+            word.difficultyLevel = when (word.difficultyLevel) {
+                DifficultyLevel.EASY -> DifficultyLevel.MEDIUM
+                DifficultyLevel.MEDIUM -> DifficultyLevel.HARD
+                DifficultyLevel.MASTERED -> DifficultyLevel.MEDIUM
+                else -> DifficultyLevel.HARD
+            }
+            
+            // 重新设置复习时间，缩短间隔
+            word.nextReviewTime = calculateNextReviewTime(word, true)
+            saveWords()
+        }
+    }
+    
+    // 计算下次复习时间
+    private fun calculateNextReviewTime(word: Word, isIncorrect: Boolean = false): Long {
+        val currentTime = System.currentTimeMillis()
+        val baseInterval = when (word.difficultyLevel) {
+            DifficultyLevel.UNKNOWN -> 1 * 24 * 60 * 60 * 1000L // 1天
+            DifficultyLevel.HARD -> if (isIncorrect) 1 * 24 * 60 * 60 * 1000L else 2 * 24 * 60 * 60 * 1000L // 1-2天
+            DifficultyLevel.MEDIUM -> if (isIncorrect) 2 * 24 * 60 * 60 * 1000L else 5 * 24 * 60 * 60 * 1000L // 2-5天
+            DifficultyLevel.EASY -> if (isIncorrect) 3 * 24 * 60 * 60 * 1000L else 10 * 24 * 60 * 60 * 1000L // 3-10天
+            DifficultyLevel.MASTERED -> if (isIncorrect) 7 * 24 * 60 * 60 * 1000L else 30 * 24 * 60 * 60 * 1000L // 7-30天
+        }
+        
+        // 根据复习次数调整间隔
+        val multiplier = minOf(word.reviewCount.toFloat() / 3f + 1f, 3f)
+        return currentTime + (baseInterval * multiplier).toLong()
+    }
+    
+    // 获取学习进度统计
+    fun getLearningProgress(): LearningProgress {
+        val progress = preferencesManager.loadLearningProgress()
+        
+        // 更新实时统计
+        progress.totalWords = words.size
+        progress.masteredWords = words.count { it.difficultyLevel == DifficultyLevel.MASTERED }
+        progress.wordsInProgress = words.count { it.isLearned && it.difficultyLevel != DifficultyLevel.MASTERED }
+        
+        return progress
+    }
+    
+    // 更新学习进度
+    fun updateLearningProgress(wordsLearned: Int = 0, reviewsCompleted: Int = 0, studyTime: Long = 0L) {
+        val progress = getLearningProgress()
+        progress.wordsLearnedToday += wordsLearned
+        progress.reviewsCompletedToday += reviewsCompleted
+        progress.totalStudyTime += studyTime
+        progress.totalSessions++
+        
+        preferencesManager.saveLearningProgress(progress)
+        preferencesManager.updateTodayStats(wordsLearned, reviewsCompleted, studyTime)
+    }
+    
+    // 获取按难度分类的单词
+    fun getWordsByDifficulty(difficulty: DifficultyLevel): List<Word> {
+        return words.filter { it.difficultyLevel == difficulty }
+    }
+    
+    // 获取需要加强练习的单词
+    fun getWordsNeedingPractice(): List<Word> {
+        return words.filter { word ->
+            word.isLearned && 
+            (word.incorrectAnswers > word.correctAnswers || 
+             word.difficultyLevel == DifficultyLevel.HARD)
+        }
+    }
 }

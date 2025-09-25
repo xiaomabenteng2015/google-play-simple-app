@@ -79,5 +79,16 @@ class LearningActivity : AppCompatActivity() {
                 finish()
             }
         }
+        
+        // 新增的观察者
+        viewModel.sessionStats.observe(this) { stats ->
+            // 可以在这里显示学习统计
+            // 例如在toolbar中显示正确率
+        }
+        
+        viewModel.progressText.observe(this) { progressText ->
+            // 可以在这里显示学习进度
+            // 例如在toolbar中显示 "3/10"
+        }
     }
 }
