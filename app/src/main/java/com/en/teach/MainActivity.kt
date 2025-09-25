@@ -58,8 +58,8 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("review_mode", true)
                 learningLauncher.launch(intent)
             } else {
-                // 显示提示信息
-                android.widget.Toast.makeText(this, "暂时没有需要复习的单词", android.widget.Toast.LENGTH_SHORT).show()
+                // Show message when no words need review
+                android.widget.Toast.makeText(this, "No words need review right now", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.wordsForReview.observe(this) { reviewCount ->
             // 更新复习按钮的文字，显示需要复习的单词数
             if (reviewCount > 0) {
-                binding.btnReview.text = "复习 ($reviewCount)"
+                binding.btnReview.text = "Review ($reviewCount)"
             } else {
                 binding.btnReview.text = getString(R.string.review_learned)
             }

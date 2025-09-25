@@ -147,7 +147,7 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
             val total = session.wordsStudied
             val correct = session.correctAnswers
             val accuracy = if (total > 0) (correct * 100) / total else 0
-            _sessionStats.value = "正确: $correct/$total ($accuracy%)"
+            _sessionStats.value = "Correct: $correct/$total ($accuracy%)"
         }
     }
     

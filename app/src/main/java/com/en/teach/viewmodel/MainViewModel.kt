@@ -115,16 +115,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val recommendations = mutableListOf<String>()
         
         if (reviewCount > 0) {
-            recommendations.add("你有 $reviewCount 个单词需要复习")
+            recommendations.add("You have $reviewCount words to review")
         }
         
         if (progress.wordsLearnedToday < progress.dailyGoal) {
             val remaining = progress.dailyGoal - progress.wordsLearnedToday
-            recommendations.add("今天还需学习 $remaining 个单词完成目标")
+            recommendations.add("Learn $remaining more words to reach today's goal")
         }
         
         if (progress.currentStreak >= 7) {
-            recommendations.add("太棒了！你已经连续学习 ${progress.currentStreak} 天")
+            recommendations.add("Great! You've studied for ${progress.currentStreak} days in a row")
         }
         
         return recommendations
@@ -134,15 +134,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val achievements = mutableListOf<String>()
         
         if (progress.currentStreak == 7) {
-            achievements.add("🏆 连续学习一周！")
+            achievements.add("🏆 One week streak!")
         }
         
         if (progress.currentStreak == 30) {
-            achievements.add("🎉 连续学习一个月！")
+            achievements.add("🎉 One month streak!")
         }
         
         if (progress.masteredWords >= 50) {
-            achievements.add("📚 掌握50个单词！")
+            achievements.add("📚 Mastered 50 words!")
         }
         
         return achievements
