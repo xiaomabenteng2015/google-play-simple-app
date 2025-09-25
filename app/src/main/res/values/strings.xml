@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">EnTeacher</string>
+    
+    <!-- Main Activity Strings -->
+    <string name="total_words">Total Words</string>
+    <string name="mastered_words">Mastered</string>
+    <string name="start_learning">Start Learning</string>
+    <string name="word_list">Word List</string>
+    <string name="review_learned">Review Learned</string>
+    <string name="learning_progress">Learning Progress</string>
+    <string name="progress_complete">%d%% Complete</string>
+    
+    <!-- Learning Activity Strings -->
+    <string name="word_learning">Word Learning</string>
+    <string name="show_answer">Show Answer</string>
+    <string name="know_word">Know</string>
+    <string name="dont_know_word">Don\'t Know</string>
+    
+    <!-- General Strings -->
+    <string name="app_subtitle">Your personal vocabulary assistant</string>
+</resources>

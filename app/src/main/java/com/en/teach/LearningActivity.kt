@@ -1,0 +1,83 @@
+package com.en.teach
+
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.en.teach.databinding.ActivityLearningBinding
+import com.en.teach.viewmodel.LearningViewModel
+
+class LearningActivity : AppCompatActivity() {
+    
+    private lateinit var binding: ActivityLearningBinding
+    private lateinit var viewModel: LearningViewModel
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLearningBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        val reviewMode = intent.getBooleanExtra("review_mode", false)
+        viewModel = ViewModelProvider(this)[LearningViewModel::class.java]
+        viewModel.setReviewMode(reviewMode)
+        
+        setupUI()
+        observeViewModel()
+        
+        viewModel.loadNextWord()
+    }
+    
+    private fun setupUI() {
+        binding.toolbar.setNavigationOnClickListener {
+            finish()
+        }
+        
+        binding.btnShowAnswer.setOnClickListener {
+            viewModel.showAnswer()
+        }
+        
+        binding.btnKnow.setOnClickListener {
+            viewModel.markAsKnown()
+        }
+        
+        binding.btnDontKnow.setOnClickListener {
+            viewModel.markAsUnknown()
+        }
+    }
+    
+    private fun observeViewModel() {
+        viewModel.currentWord.observe(this) { word ->
+            word?.let {
+                binding.tvEnglishWord.text = it.english
+                binding.tvPronunciation.text = it.pronunciation
+                binding.tvChineseTranslation.text = it.chinese
+                binding.tvExample.text = it.example
+                binding.tvExampleTranslation.text = it.exampleTranslation
+            }
+        }
+        
+        viewModel.showAnswer.observe(this) { show ->
+            if (show) {
+                binding.tvChineseTranslation.visibility = View.VISIBLE
+                binding.tvExample.visibility = View.VISIBLE
+                binding.tvExampleTranslation.visibility = View.VISIBLE
+                binding.btnShowAnswer.visibility = View.GONE
+                binding.btnKnow.visibility = View.VISIBLE
+                binding.btnDontKnow.visibility = View.VISIBLE
+            } else {
+                binding.tvChineseTranslation.visibility = View.GONE
+                binding.tvExample.visibility = View.GONE
+                binding.tvExampleTranslation.visibility = View.GONE
+                binding.btnShowAnswer.visibility = View.VISIBLE
+                binding.btnKnow.visibility = View.GONE
+                binding.btnDontKnow.visibility = View.GONE
+            }
+        }
+        
+        viewModel.isFinished.observe(this) { finished ->
+            if (finished) {
+                finish()
+            }
+        }
+    }
+}
