@@ -8,15 +8,25 @@
     tools:context=".LearningActivity">
 
     <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- 在Toolbar外面包一层容器 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="@color/primary_color"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_back"
-        app:title="@string/word_learning"
-        app:titleTextColor="@android:color/white" />
+        android:fitsSystemWindows="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary_color"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/word_learning"
+            app:titleTextColor="@android:color/white" />
+    </LinearLayout>
+
 
     <!-- Word Card -->
     <androidx.cardview.widget.CardView

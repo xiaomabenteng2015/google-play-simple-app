@@ -8,7 +8,7 @@ import com.en.teach.adapter.WordAdapter
 import com.en.teach.databinding.ActivityWordListBinding
 import com.en.teach.viewmodel.WordListViewModel
 
-class WordListActivity : AppCompatActivity() {
+class WordListActivity : BaseActivity() {
     
     private lateinit var binding: ActivityWordListBinding
     private lateinit var viewModel: WordListViewModel
@@ -40,4 +40,6 @@ class WordListActivity : AppCompatActivity() {
             adapter.submitList(words)
         }
     }
+    
+
 }

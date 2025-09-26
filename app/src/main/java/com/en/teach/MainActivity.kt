@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.en.teach.databinding.ActivityMainBinding
 import com.en.teach.viewmodel.MainViewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
@@ -27,7 +27,18 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+
+        
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        
+        // Setup immersive header for MainActivity
+        val statusBarHeight = getStatusBarHeight()
+        binding.headerLayout.setPadding(
+            binding.headerLayout.paddingLeft,
+            binding.headerLayout.paddingTop + statusBarHeight,
+            binding.headerLayout.paddingRight,
+            binding.headerLayout.paddingBottom
+        )
         
         setupUI()
         observeViewModel()
@@ -104,5 +115,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.refreshData()
     }
     
+    private fun getStatusBarHeight(): Int {
+        var result = 0
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) {
+            result = resources.getDimensionPixelSize(resourceId)
+        }
+        return result
+    }
 
 }

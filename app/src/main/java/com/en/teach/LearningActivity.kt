@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.en.teach.databinding.ActivityLearningBinding
 import com.en.teach.viewmodel.LearningViewModel
 
-class LearningActivity : AppCompatActivity() {
+class LearningActivity : BaseActivity() {
     
     private lateinit var binding: ActivityLearningBinding
     private lateinit var viewModel: LearningViewModel
@@ -95,4 +95,6 @@ class LearningActivity : AppCompatActivity() {
             // 例如在toolbar中显示 "3/10"
         }
     }
+    
+
 }
