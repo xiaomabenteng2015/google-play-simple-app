@@ -131,36 +131,41 @@ class PreferencesManager(context: Context) {
         saveDailyStats(allStats)
     }
     
-    // 检查是否需要重置每日进度
-    fun checkAndResetDailyProgress(): Boolean {
-        val progress = loadLearningProgress()
+    fun updateLearningProgressForSession(
+        progress: LearningProgress,
+        wordsLearned: Int,
+        reviewsCompleted: Int,
+        studyTime: Long
+    ): LearningProgress {
+        if (wordsLearned <= 0 && reviewsCompleted <= 0) {
+            return progress
+        }
+
         val today = getTodayDateString()
-        
         if (progress.lastStudyDate != today) {
             val previousDate = progress.lastStudyDate
-            
-            // 更新连续学习天数
-            if (previousDate.isNotEmpty() && isConsecutiveDay(previousDate, today)) {
-                progress.currentStreak++
-                if (progress.currentStreak > progress.longestStreak) {
-                    progress.longestStreak = progress.currentStreak
-                }
-            } else if (previousDate.isNotEmpty()) {
-                // 不是连续的天数，重置为1
-                progress.currentStreak = 1
-            } else {
-                // 第一次使用应用
-                progress.currentStreak = 1
-            }
-            
-            // 新的一天，重置每日进度
-            progress.lastStudyDate = today
+
             progress.wordsLearnedToday = 0
             progress.reviewsCompletedToday = 0
-            saveLearningProgress(progress)
-            return true
+
+            if (previousDate.isNotEmpty() && isConsecutiveDay(previousDate, today)) {
+                progress.currentStreak++
+            } else if (previousDate.isNotEmpty()) {
+                progress.currentStreak = 1
+            } else {
+                progress.currentStreak = 1
+            }
+
+            progress.longestStreak = maxOf(progress.longestStreak, progress.currentStreak)
+            progress.lastStudyDate = today
         }
-        return false
+
+        progress.wordsLearnedToday += wordsLearned
+        progress.reviewsCompletedToday += reviewsCompleted
+        progress.totalStudyTime += studyTime
+        progress.totalSessions++
+        saveLearningProgress(progress)
+        return progress
     }
     
     private fun isConsecutiveDay(lastDate: String, currentDate: String): Boolean {

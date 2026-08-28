@@ -19,6 +19,10 @@ class LearningStatsManager(context: Context) {
     // 结束学习会话并保存
     fun endLearningSession(session: LearningSession) {
         session.endTime = System.currentTimeMillis()
+        if (session.wordsStudied == 0) {
+            return
+        }
+
         preferencesManager.saveLearningSession(session)
         
         // 更新今日统计
@@ -30,7 +34,7 @@ class LearningStatsManager(context: Context) {
         
         val studyTime = session.endTime - session.startTime
         preferencesManager.updateTodayStats(
-            wordsLearned = if (session.sessionType == SessionType.LEARNING) session.correctAnswers else 0,
+            wordsLearned = if (session.sessionType == SessionType.LEARNING) session.wordsStudied else 0,
             reviewsCompleted = if (session.sessionType == SessionType.REVIEW) session.wordsStudied else 0,
             studyTime = studyTime,
             accuracy = accuracy

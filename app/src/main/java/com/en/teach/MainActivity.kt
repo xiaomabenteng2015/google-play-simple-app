@@ -3,7 +3,6 @@ package com.en.teach
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.en.teach.databinding.ActivityMainBinding
 import com.en.teach.viewmodel.MainViewModel
@@ -16,7 +15,7 @@ class MainActivity : BaseActivity() {
     // 使用现代的 Activity Result API
     private val learningLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+    ) { _ ->
         // 学习完成后，强制刷新数据
         android.util.Log.d("MainActivity", "Learning activity finished, refreshing data")
         viewModel.refreshData()
@@ -42,13 +41,6 @@ class MainActivity : BaseActivity() {
         
         setupUI()
         observeViewModel()
-        
-        // 初始化一些测试数据（仅在第一次运行时）
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        if (!prefs.getBoolean("test_data_initialized", false)) {
-            viewModel.initializeTestData()
-            prefs.edit().putBoolean("test_data_initialized", true).apply()
-        }
     }
     
     private fun setupUI() {

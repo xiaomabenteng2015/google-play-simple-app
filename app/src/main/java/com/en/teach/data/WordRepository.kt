@@ -147,38 +147,11 @@ class WordRepository(private val context: Context) {
     
     fun getLearnedWords(): List<Word> = words.filter { it.isLearned }
     
-    fun getRandomWord(): Word? = getUnlearnedWords().randomOrNull()
-    
-    fun markWordAsLearned(wordId: Int) {
-        words.find { it.id == wordId }?.let { word ->
-            word.isLearned = true
-            word.reviewCount++
-            word.lastReviewTime = System.currentTimeMillis()
-        }
-    }
-    
-    fun markWordAsUnlearned(wordId: Int) {
-        words.find { it.id == wordId }?.isLearned = false
-    }
-    
-    fun getWordById(id: Int): Word? = words.find { it.id == id }
-    
-    // ========== 新增的功能方法 ==========
-    
     // 获取需要复习的单词（基于间隔重复算法）
     fun getWordsForReview(): List<Word> {
         val currentTime = System.currentTimeMillis()
-        val reviewWords = words.filter { word ->
+        return words.filter { word ->
             word.isLearned && (word.nextReviewTime == 0L || word.nextReviewTime <= currentTime)
-        }
-        
-        // 如果没有到期的复习单词，返回一些已学习但不是MASTERED的单词
-        return if (reviewWords.isEmpty()) {
-            words.filter { word ->
-                word.isLearned && word.difficultyLevel != DifficultyLevel.MASTERED
-            }.take(5) // 最多5个
-        } else {
-            reviewWords
         }
     }
     
@@ -212,6 +185,12 @@ class WordRepository(private val context: Context) {
     // 标记单词回答错误
     fun markWordAsIncorrect(wordId: Int) {
         words.find { it.id == wordId }?.let { word ->
+            val currentTime = System.currentTimeMillis()
+            if (!word.isLearned) {
+                word.isLearned = true
+                word.firstLearnedTime = currentTime
+            }
+
             word.incorrectAnswers++
             word.difficultyLevel = when (word.difficultyLevel) {
                 DifficultyLevel.EASY -> DifficultyLevel.MEDIUM
@@ -257,18 +236,12 @@ class WordRepository(private val context: Context) {
     // 更新学习进度
     fun updateLearningProgress(wordsLearned: Int = 0, reviewsCompleted: Int = 0, studyTime: Long = 0L) {
         val progress = getLearningProgress()
-        progress.wordsLearnedToday += wordsLearned
-        progress.reviewsCompletedToday += reviewsCompleted
-        progress.totalStudyTime += studyTime
-        progress.totalSessions++
-        
-        // 更新实时统计
-        progress.totalWords = words.size
-        progress.masteredWords = words.count { it.difficultyLevel == DifficultyLevel.MASTERED }
-        progress.wordsInProgress = words.count { it.isLearned && it.difficultyLevel != DifficultyLevel.MASTERED }
-        
-        preferencesManager.saveLearningProgress(progress)
-        preferencesManager.updateTodayStats(wordsLearned, reviewsCompleted, studyTime)
+        preferencesManager.updateLearningProgressForSession(
+            progress = progress,
+            wordsLearned = wordsLearned,
+            reviewsCompleted = reviewsCompleted,
+            studyTime = studyTime
+        )
     }
     
     // 获取按难度分类的单词
@@ -282,40 +255,6 @@ class WordRepository(private val context: Context) {
             word.isLearned && 
             (word.incorrectAnswers > word.correctAnswers || 
              word.difficultyLevel == DifficultyLevel.HARD)
-        }
-    }
-    
-    // 测试方法：将前几个单词设置为不同的掌握状态
-    fun initializeTestData() {
-        if (words.isNotEmpty()) {
-            val currentTime = System.currentTimeMillis()
-            
-            // 将前10个单词设置为已学习，不同难度级别
-            for (i in 0 until minOf(10, words.size)) {
-                words[i].isLearned = true
-                words[i].correctAnswers = 2 + i % 3
-                words[i].incorrectAnswers = i % 2
-                words[i].firstLearnedTime = currentTime - (i * 24 * 60 * 60 * 1000L)
-                words[i].lastReviewTime = currentTime - (i * 12 * 60 * 60 * 1000L)
-                
-                // 设置不同的难度级别
-                words[i].difficultyLevel = when (i % 4) {
-                    0 -> DifficultyLevel.HARD
-                    1 -> DifficultyLevel.MEDIUM  
-                    2 -> DifficultyLevel.EASY
-                    3 -> DifficultyLevel.MASTERED
-                    else -> DifficultyLevel.MEDIUM
-                }
-                
-                // 设置复习时间（让一些单词需要复习）
-                words[i].nextReviewTime = if (i < 3) {
-                    currentTime - 60000 // 1分钟前就该复习了
-                } else {
-                    currentTime + (i * 24 * 60 * 60 * 1000L) // 未来某个时间复习
-                }
-            }
-            
-            saveWords()
         }
     }
 }

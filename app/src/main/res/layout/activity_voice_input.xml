@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="语音输入"
+        android:text="@string/voice_input_title"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp" />
@@ -19,13 +19,13 @@
         android:layout_height="120dp"
         android:src="@drawable/ic_voice_recording"
         android:layout_marginBottom="32dp"
-        android:contentDescription="语音录制图标" />
+        android:contentDescription="@string/voice_recording_icon_description" />
 
     <Button
         android:id="@+id/btn_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="按住说话"
+        android:text="@string/voice_hold_to_record"
         android:textSize="18sp"
         android:padding="16dp"
         android:background="@drawable/shape_oval_sweep"
@@ -34,7 +34,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="长按按钮开始录音，松开结束录音"
+        android:text="@string/voice_recording_instruction"
         android:textSize="14sp"
         android:layout_marginTop="16dp"
         android:textColor="#666666" />

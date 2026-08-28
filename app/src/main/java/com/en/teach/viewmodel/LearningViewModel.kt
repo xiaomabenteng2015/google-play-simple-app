@@ -35,13 +35,7 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
     fun setReviewMode(isReview: Boolean) {
         reviewMode = isReview
         currentWordsList = if (isReview) {
-            val reviewWords = repository.getWordsForReview().toMutableList()
-            // 如果没有需要复习的单词，使用已学习的单词进行复习
-            if (reviewWords.isEmpty()) {
-                repository.getLearnedWords().take(10).toMutableList()
-            } else {
-                reviewWords
-            }
+            repository.getWordsForReview().toMutableList()
         } else {
             val unlearnedWords = repository.getUnlearnedWords()
             // 如果没有未学习的单词，提示用户
@@ -81,7 +75,7 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
             
             if (!reviewMode) {
                 // 学习模式：根据当前的正确率调整难度级别
-                val difficulty = calculateDifficultyLevel(word)
+                val difficulty = calculateDifficultyLevel()
                 repository.markWordAsLearned(word.id, difficulty)
             } else {
                 // 复习模式：根据表现调整难度，连续正确可以升级
@@ -111,17 +105,12 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
             currentSession?.incorrectAnswers = (currentSession?.incorrectAnswers ?: 0) + 1
             currentSession?.wordsStudied = (currentSession?.wordsStudied ?: 0) + 1
             
-            if (reviewMode) {
-                repository.markWordAsIncorrect(word.id)
-            } else {
-                // 学习模式：标记为困难
-                repository.markWordAsLearned(word.id, DifficultyLevel.HARD)
-            }
+            repository.markWordAsIncorrect(word.id)
         }
         nextWord()
     }
     
-    private fun calculateDifficultyLevel(word: Word): DifficultyLevel {
+    private fun calculateDifficultyLevel(): DifficultyLevel {
         val session = currentSession ?: return DifficultyLevel.MEDIUM
         val accuracy = if (session.wordsStudied > 0) {
             session.correctAnswers.toFloat() / session.wordsStudied.toFloat()
@@ -163,63 +152,14 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
             statsManager.endLearningSession(session)
             
             // 更新repository中的学习进度
-            val wordsLearned = if (!reviewMode) session.correctAnswers else 0
+            val wordsLearned = if (!reviewMode) session.wordsStudied else 0
             val reviewsCompleted = if (reviewMode) session.wordsStudied else 0
             val studyTime = session.endTime - session.startTime
             
             repository.updateLearningProgress(wordsLearned, reviewsCompleted, studyTime)
-            
-            // 更新今日学习进度，确保连续天数正确计算
-            val preferencesManager = com.en.teach.data.PreferencesManager(getApplication())
-            
-            // 如果有学习活动，更新今日学习日期和连续天数
-            if (wordsLearned > 0 || reviewsCompleted > 0) {
-                val progress = preferencesManager.loadLearningProgress()
-                val today = preferencesManager.getTodayDateString()
-                
-                // 如果今天还没有学习记录，更新连续天数
-                if (progress.lastStudyDate != today) {
-                    // 检查是否是连续的一天
-                    if (progress.lastStudyDate.isNotEmpty()) {
-                        val isConsecutive = isConsecutiveDay(progress.lastStudyDate, today)
-                        if (isConsecutive) {
-                            progress.currentStreak++
-                        } else {
-                            progress.currentStreak = 1
-                        }
-                    } else {
-                        progress.currentStreak = 1
-                    }
-                    
-                    // 更新最长连续天数
-                    if (progress.currentStreak > progress.longestStreak) {
-                        progress.longestStreak = progress.currentStreak
-                    }
-                    
-                    progress.lastStudyDate = today
-                    preferencesManager.saveLearningProgress(progress)
-                }
-            }
         }
         
         _isFinished.value = true
-    }
-    
-    private fun isConsecutiveDay(lastDate: String, currentDate: String): Boolean {
-        try {
-            val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-            val lastDateObj = dateFormat.parse(lastDate)
-            val currentDateObj = dateFormat.parse(currentDate)
-            
-            if (lastDateObj != null && currentDateObj != null) {
-                val diffInMillis = currentDateObj.time - lastDateObj.time
-                val diffInDays = diffInMillis / (24 * 60 * 60 * 1000)
-                return diffInDays == 1L
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return false
     }
     
     override fun onCleared() {

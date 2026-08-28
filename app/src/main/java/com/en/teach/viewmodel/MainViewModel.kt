@@ -11,9 +11,7 @@ import com.en.teach.model.LearningProgress
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     
-    private val repository = WordRepository(application)
     private val statsManager = LearningStatsManager(application)
-    private val preferencesManager = com.en.teach.data.PreferencesManager(application)
     
     // SharedPreferences 监听器
     private val prefsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -63,12 +61,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _achievements = MutableLiveData<List<String>>()
     val achievements: LiveData<List<String>> = _achievements
     
-    // 初始化测试数据（仅用于演示）
-    fun initializeTestData() {
-        repository.initializeTestData()
-        refreshData()
-    }
-    
     // 强制刷新所有数据
     fun forceRefreshData() {
         refreshData()
@@ -76,9 +68,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     
     fun refreshData() {
         android.util.Log.d("MainViewModel", "refreshData called")
-        
-        // 检查并重置每日进度（这会更新连续天数）
-        preferencesManager.checkAndResetDailyProgress()
         
         // 重新创建repository实例以确保获取最新数据
         val freshRepository = com.en.teach.data.WordRepository(getApplication())

@@ -25,8 +25,12 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:data="shortcut2"
-            android:targetClass="com.en.teach.WordListActivity"
-            android:targetPackage="com.en.teach" />
+            android:targetClass="com.en.teach.LearningActivity"
+            android:targetPackage="com.en.teach">
+            <extra
+                android:name="review_mode"
+                android:value="true" />
+        </intent>
     </shortcut>
 
     <!-- 新增语音录入快捷方式 -->

@@ -3,110 +3,162 @@ package com.en.teach
 import android.Manifest
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
+import android.os.Build
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import java.io.IOException
+import java.io.File
+
 /**
- * Desc：语音输入Activity，实现类似微信长按录音的语音录入功能
+ * 长按录音并把音频保存到应用专属目录。
  */
 class VoiceInputActivity : BaseActivity() {
 
     private lateinit var recordButton: Button
-    private lateinit var mediaRecorder: MediaRecorder
+    private var mediaRecorder: MediaRecorder? = null
+    private var recordingFile: File? = null
     private var isRecording = false
+    private var isRecordButtonPressed = false
 
-    companion object {
-        private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
+    private val requestRecordAudioPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted && isRecordButtonPressed) {
+            startRecording()
+        } else if (!granted) {
+            resetRecordingUi()
+            Toast.makeText(this, R.string.voice_permission_denied, Toast.LENGTH_SHORT).show()
+        }
     }
-
-    private val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_voice_input)
 
         initViews()
-        checkPermissions()
     }
 
     private fun initViews() {
         recordButton = findViewById(R.id.btn_record)
         recordButton.setOnTouchListener { _, event ->
             when (event.action) {
-                android.view.MotionEvent.ACTION_DOWN -> {
-                    startRecording()
+                MotionEvent.ACTION_DOWN -> {
+                    isRecordButtonPressed = true
+                    if (hasRecordAudioPermission()) {
+                        startRecording()
+                    } else {
+                        requestRecordAudioPermission.launch(Manifest.permission.RECORD_AUDIO)
+                    }
                     true
                 }
-                android.view.MotionEvent.ACTION_UP -> {
+                MotionEvent.ACTION_UP -> {
+                    isRecordButtonPressed = false
+                    stopRecording()
+                    recordButton.performClick()
+                    true
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    isRecordButtonPressed = false
                     stopRecording()
                     true
                 }
-                else -> false
+                else -> true
             }
         }
     }
 
-    private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
-        }
-    }
+    private fun hasRecordAudioPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
+            PackageManager.PERMISSION_GRANTED
 
     private fun startRecording() {
-        if (!isRecording) {
-            try {
-                mediaRecorder = MediaRecorder().apply {
-                    setAudioSource(MediaRecorder.AudioSource.MIC)
-                    setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                    setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-                    setOutputFile(getExternalFilesDir(null)?.absolutePath + "/voice_input.3gp")
+        if (isRecording || !isRecordButtonPressed || !hasRecordAudioPermission()) {
+            return
+        }
 
-                    prepare()
-                    start()
-                }
+        val outputDirectory = getExternalFilesDir(null)
+        if (outputDirectory == null) {
+            Toast.makeText(this, R.string.voice_recording_start_failed, Toast.LENGTH_SHORT).show()
+            return
+        }
 
-                isRecording = true
-                recordButton.text = "松开结束"
-                Toast.makeText(this, "开始录音", Toast.LENGTH_SHORT).show()
-            } catch (e: IOException) {
-                Toast.makeText(this, "录音初始化失败", Toast.LENGTH_SHORT).show()
+        val outputFile = File(outputDirectory, "voice_input.3gp")
+        val recorder = createMediaRecorder()
+        try {
+            recorder.apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                setOutputFile(outputFile.absolutePath)
+                prepare()
+                start()
             }
+
+            mediaRecorder = recorder
+            recordingFile = outputFile
+            isRecording = true
+            recordButton.text = getString(R.string.voice_release_to_stop)
+            Toast.makeText(this, R.string.voice_recording_started, Toast.LENGTH_SHORT).show()
+        } catch (error: Exception) {
+            recorder.release()
+            outputFile.delete()
+            resetRecordingUi()
+            Toast.makeText(this, R.string.voice_recording_start_failed, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun stopRecording() {
-        if (isRecording) {
-            try {
-                mediaRecorder.apply {
-                    stop()
-                    release()
-                }
-                isRecording = false
-                recordButton.text = "按住说话"
-                Toast.makeText(this, "录音结束", Toast.LENGTH_SHORT).show()
+    @Suppress("DEPRECATION")
+    private fun createMediaRecorder(): MediaRecorder =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            MediaRecorder(this)
+        } else {
+            MediaRecorder()
+        }
 
-                // TODO: 这里可以添加语音识别和处理逻辑
-                processVoiceInput()
-            } catch (e: Exception) {
-                Toast.makeText(this, "录音停止失败", Toast.LENGTH_SHORT).show()
+    private fun stopRecording(showResult: Boolean = true) {
+        val recorder = mediaRecorder ?: run {
+            resetRecordingUi()
+            return
+        }
+
+        mediaRecorder = null
+        isRecording = false
+        try {
+            recorder.stop()
+            if (showResult) {
+                Toast.makeText(this, R.string.voice_recording_saved, Toast.LENGTH_SHORT).show()
             }
+        } catch (error: RuntimeException) {
+            recordingFile?.delete()
+            if (showResult) {
+                Toast.makeText(this, R.string.voice_recording_stop_failed, Toast.LENGTH_SHORT).show()
+            }
+        } finally {
+            recorder.release()
+            recordingFile = null
+            resetRecordingUi()
         }
     }
 
-    private fun processVoiceInput() {
-        // TODO: 实现语音识别逻辑
-        // 可以集成第三方语音识别SDK如讯飞、百度等
-        Toast.makeText(this, "正在识别语音...", Toast.LENGTH_SHORT).show()
+    private fun resetRecordingUi() {
+        isRecording = false
+        if (::recordButton.isInitialized) {
+            recordButton.text = getString(R.string.voice_hold_to_record)
+        }
+    }
+
+    override fun onStop() {
+        isRecordButtonPressed = false
+        stopRecording(showResult = false)
+        super.onStop()
     }
 
     override fun onDestroy() {
+        mediaRecorder?.release()
+        mediaRecorder = null
         super.onDestroy()
-        if (isRecording) {
-            mediaRecorder.release()
-        }
     }
 }
