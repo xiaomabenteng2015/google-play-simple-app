@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import java.io.File
 
 /**
@@ -38,6 +39,14 @@ class VoiceInputActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_voice_input)
 
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+        applySystemBarInsets(
+            findViewById(R.id.voiceInputRoot),
+            left = true,
+            top = true,
+            right = true,
+            bottom = true
+        )
         initViews()
     }
 

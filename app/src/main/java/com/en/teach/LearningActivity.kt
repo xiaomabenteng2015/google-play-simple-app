@@ -16,7 +16,10 @@ class LearningActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLearningBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
+        applySystemBarInsets(binding.toolbarContainer, left = true, top = true, right = true)
+        applySystemBarInsets(binding.buttonLayout, left = true, right = true, bottom = true)
+
         val reviewMode = intent.getBooleanExtra("review_mode", false)
         viewModel = ViewModelProvider(this)[LearningViewModel::class.java]
         viewModel.setReviewMode(reviewMode)

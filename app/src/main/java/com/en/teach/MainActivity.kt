@@ -25,20 +25,12 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
 
-        
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        
-        // Setup immersive header for MainActivity
-        val statusBarHeight = getStatusBarHeight()
-        binding.headerLayout.setPadding(
-            binding.headerLayout.paddingLeft,
-            binding.headerLayout.paddingTop + statusBarHeight,
-            binding.headerLayout.paddingRight,
-            binding.headerLayout.paddingBottom
-        )
-        
+
+        applySystemBarInsets(binding.headerLayout, left = true, top = true, right = true)
+        applySystemBarInsets(binding.root, bottom = true)
+
         setupUI()
         observeViewModel()
     }
@@ -107,13 +99,4 @@ class MainActivity : BaseActivity() {
         viewModel.refreshData()
     }
     
-    private fun getStatusBarHeight(): Int {
-        var result = 0
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        if (resourceId > 0) {
-            result = resources.getDimensionPixelSize(resourceId)
-        }
-        return result
-    }
-
 }

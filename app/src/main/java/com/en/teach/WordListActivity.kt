@@ -18,7 +18,10 @@ class WordListActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityWordListBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
+        applySystemBarInsets(binding.toolbarLl, left = true, top = true, right = true)
+        applySystemBarInsets(binding.recyclerView, left = true, right = true, bottom = true)
+
         viewModel = ViewModelProvider(this)[WordListViewModel::class.java]
         
         setupUI()
