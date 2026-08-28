@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/shape_oval_sweep"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message1"
+        android:shortcutId="id11"
+        android:shortcutLongLabel="@string/shortcut_long_label1"
+        android:shortcutShortLabel="@string/shortcut_short_label1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="shortcut1"
+            android:targetClass="com.en.teach.LearningActivity"
+            android:targetPackage="com.en.teach" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message2"
+        android:shortcutId="id22"
+        android:icon="@drawable/shape_oval_liner"
+        android:shortcutLongLabel="@string/shortcut_long_label2"
+        android:shortcutShortLabel="@string/shortcut_short_label2">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="shortcut2"
+            android:targetClass="com.en.teach.WordListActivity"
+            android:targetPackage="com.en.teach" />
+    </shortcut>
+
+    <!-- 新增语音录入快捷方式 -->
+    <shortcut
+        android:enabled="true"
+        android:shortcutDisabledMessage="@string/shortcut_voice_disabled"
+        android:shortcutId="voice_input"
+        android:icon="@drawable/ic_voice_recording"
+        android:shortcutLongLabel="@string/shortcut_voice_long_label"
+        android:shortcutShortLabel="@string/shortcut_voice_short_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="voiceinput"
+            android:targetClass="com.en.teach.VoiceInputActivity"
+            android:targetPackage="com.en.teach" />
+    </shortcut>
+
+</shortcuts>

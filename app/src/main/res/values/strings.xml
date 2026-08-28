@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">EnTeacher</string>
-    
+
     <!-- Main Activity Strings -->
     <string name="total_words">Total Words</string>
     <string name="mastered_words">Mastered</string>
@@ -14,7 +14,7 @@
     <string name="learning_progress">Learning Progress</string>
     <string name="daily_stats">Today\'s Stats</string>
     <string name="progress_complete">%d%% Complete</string>
-    
+
     <!-- Learning Activity Strings -->
     <string name="word_learning">Word Learning</string>
     <string name="word_review">Word Review</string>
@@ -22,7 +22,7 @@
     <string name="know_word">Know</string>
     <string name="dont_know_word">Don\'t Know</string>
     <string name="session_stats">Session Stats</string>
-    
+
     <!-- Statistics Strings -->
     <string name="words_learned_today">Words Learned Today</string>
     <string name="reviews_completed_today">Reviews Completed Today</string>
@@ -31,13 +31,26 @@
     <string name="daily_goal">Daily Goal</string>
     <string name="achievements">Achievements</string>
     <string name="recommendations">Recommendations</string>
-    
+
     <!-- Time formats -->
     <string name="minutes_format">%d min</string>
     <string name="hours_minutes_format" formatted="false">%dh %dm</string>
-    
+
     <!-- General Strings -->
     <string name="app_subtitle">Your personal vocabulary assistant</string>
     <string name="settings">Settings</string>
     <string name="statistics">Statistics</string>
+    <!-- Shortcut Strings -->
+    <string name="shortcut_disabled_message1">Shortcut 1 is disabled</string>
+    <string name="shortcut_long_label1">Open Word Learning</string>
+    <string name="shortcut_short_label1">Learn Words</string>
+    <string name="shortcut_disabled_message2">Shortcut 2 is disabled</string>
+    <string name="shortcut_long_label2">Open Word Review</string>
+    <string name="shortcut_short_label2">Review Words</string>
+
+    <!-- 语音录入快捷方式字符串 -->
+    <string name="shortcut_voice_disabled">Voice input is disabled</string>
+    <string name="shortcut_voice_long_label">Voice Word Input</string>
+    <string name="shortcut_voice_short_label">Voice Input</string>
+
 </resources>
