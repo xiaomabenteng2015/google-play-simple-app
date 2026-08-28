@@ -99,4 +99,31 @@ class LearningDataRegressionTest {
         assertEquals(1, progress.currentStreak)
         assertEquals(2, progress.totalSessions)
     }
+
+    @Test
+    fun singleWordModeLoadsOnlyRequestedWordAndUpdatesIt() {
+        val viewModel = LearningViewModel(application)
+
+        viewModel.setSingleWordMode(42)
+        viewModel.loadNextWord()
+        assertEquals(42, viewModel.currentWord.value?.id)
+
+        viewModel.markAsKnown()
+
+        assertEquals(true, viewModel.isFinished.value)
+        val repository = WordRepository(application)
+        assertEquals(1, repository.getWordById(42)?.correctAnswers)
+        assertEquals(0, repository.getWordById(41)?.correctAnswers)
+    }
+
+    @Test
+    fun invalidSingleWordIdFinishesSafely() {
+        val viewModel = LearningViewModel(application)
+
+        viewModel.setSingleWordMode(Int.MAX_VALUE)
+        viewModel.loadNextWord()
+
+        assertEquals(true, viewModel.isFinished.value)
+        assertEquals(null, viewModel.currentWord.value)
+    }
 }

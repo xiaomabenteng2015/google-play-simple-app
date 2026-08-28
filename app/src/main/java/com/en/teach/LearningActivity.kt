@@ -20,9 +20,13 @@ class LearningActivity : BaseActivity() {
         applySystemBarInsets(binding.toolbarContainer, left = true, top = true, right = true)
         applySystemBarInsets(binding.buttonLayout, left = true, right = true, bottom = true)
 
-        val reviewMode = intent.getBooleanExtra("review_mode", false)
         viewModel = ViewModelProvider(this)[LearningViewModel::class.java]
-        viewModel.setReviewMode(reviewMode)
+        val wordId = intent.getIntExtra(EXTRA_WORD_ID, INVALID_WORD_ID)
+        if (wordId != INVALID_WORD_ID) {
+            viewModel.setSingleWordMode(wordId)
+        } else {
+            viewModel.setReviewMode(intent.getBooleanExtra(EXTRA_REVIEW_MODE, false))
+        }
         
         setupUI()
         observeViewModel()
@@ -98,6 +102,9 @@ class LearningActivity : BaseActivity() {
             // 例如在toolbar中显示 "3/10"
         }
     }
-    
-
+    companion object {
+        const val EXTRA_REVIEW_MODE = "review_mode"
+        const val EXTRA_WORD_ID = "word_id"
+        private const val INVALID_WORD_ID = -1
+    }
 }

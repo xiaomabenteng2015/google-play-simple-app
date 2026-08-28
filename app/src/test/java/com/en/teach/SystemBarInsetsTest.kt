@@ -5,7 +5,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -43,10 +43,10 @@ class SystemBarInsetsTest {
     }
 
     @Test
-    fun voiceScreenUsesDarkStatusBarIconsOnLightBackground() {
+    fun voiceScreenUsesLightStatusBarIconsOnPrimaryToolbar() {
         val activity = Robolectric.buildActivity(VoiceInputActivity::class.java).setup().get()
         val controller = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
 
-        assertTrue(controller.isAppearanceLightStatusBars)
+        assertFalse(controller.isAppearanceLightStatusBars)
     }
 }

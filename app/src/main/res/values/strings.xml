@@ -11,6 +11,7 @@
     <string name="start_learning">Start Learning</string>
     <string name="word_list">Word List</string>
     <string name="review_learned">Review Words</string>
+    <string name="voice_input">Voice Input</string>
     <string name="learning_progress">Learning Progress</string>
     <string name="daily_stats">Today\'s Stats</string>
     <string name="progress_complete">%d%% Complete</string>
@@ -53,16 +54,24 @@
     <string name="shortcut_voice_long_label">Voice Word Input</string>
     <string name="shortcut_voice_short_label">Voice Input</string>
 
-    <!-- Voice recording -->
+    <!-- Voice input -->
     <string name="voice_input_title">Voice Input</string>
-    <string name="voice_recording_icon_description">Voice recording icon</string>
-    <string name="voice_hold_to_record">Hold to Record</string>
-    <string name="voice_release_to_stop">Release to Save</string>
-    <string name="voice_recording_instruction">Press and hold to record. Release to save the recording.</string>
-    <string name="voice_permission_denied">Microphone permission is required to record audio.</string>
-    <string name="voice_recording_started">Recording started</string>
-    <string name="voice_recording_start_failed">Unable to start recording</string>
-    <string name="voice_recording_saved">Recording saved</string>
-    <string name="voice_recording_stop_failed">Recording failed. Please try again.</string>
+    <string name="voice_recording_icon_description">Voice input microphone</string>
+    <string name="voice_tap_to_speak">Tap the button and say one word from the vocabulary list.</string>
+    <string name="voice_start_listening">Start Listening</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_processing">Processing…</string>
+    <string name="voice_match_found">Word found</string>
+    <string name="voice_heard">We heard: %1$s</string>
+    <string name="voice_no_vocabulary_match">No vocabulary match</string>
+    <string name="voice_not_in_vocabulary">This word is not in the current vocabulary.</string>
+    <string name="voice_study_word">Study This Word</string>
+    <string name="voice_try_again">Try Again</string>
+    <string name="voice_permission_denied">Microphone permission is required for voice input.</string>
+    <string name="voice_recognition_unavailable">Speech recognition is not available on this device.</string>
+    <string name="voice_no_match">We couldn’t hear a word. Please try again.</string>
+    <string name="voice_network_error">Speech recognition could not connect. Check your connection and try again.</string>
+    <string name="voice_recognizer_busy">Speech recognition is busy. Please wait and try again.</string>
+    <string name="voice_recognition_failed">Speech recognition failed. Please try again.</string>
 
 </resources>

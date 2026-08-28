@@ -53,6 +53,17 @@ class LearningViewModel(application: Application) : AndroidViewModel(application
         
         updateProgressText()
     }
+
+    fun setSingleWordMode(wordId: Int) {
+        val word = repository.getWordById(wordId)
+        reviewMode = word?.isLearned == true
+        currentWordsList = listOfNotNull(word).toMutableList()
+        currentIndex = 0
+
+        val sessionType = if (reviewMode) SessionType.REVIEW else SessionType.LEARNING
+        currentSession = statsManager.startLearningSession(sessionType)
+        updateProgressText()
+    }
     
     fun loadNextWord() {
         if (currentIndex < currentWordsList.size) {

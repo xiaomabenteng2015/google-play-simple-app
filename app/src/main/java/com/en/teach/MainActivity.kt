@@ -44,13 +44,17 @@ class MainActivity : BaseActivity() {
         binding.btnWordList.setOnClickListener {
             startActivity(Intent(this, WordListActivity::class.java))
         }
+
+        binding.btnVoiceInput.setOnClickListener {
+            startActivity(Intent(this, VoiceInputActivity::class.java))
+        }
         
         binding.btnReview.setOnClickListener {
             // 检查是否有需要复习的单词
             val reviewCount = viewModel.wordsForReview.value ?: 0
             if (reviewCount > 0) {
                 val intent = Intent(this, LearningActivity::class.java)
-                intent.putExtra("review_mode", true)
+                intent.putExtra(LearningActivity.EXTRA_REVIEW_MODE, true)
                 learningLauncher.launch(intent)
             } else {
                 // Show message when no words need review

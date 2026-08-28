@@ -142,6 +142,8 @@ class WordRepository(private val context: Context) {
     }
     
     fun getAllWords(): List<Word> = words.toList()
+
+    fun getWordById(wordId: Int): Word? = words.find { it.id == wordId }
     
     fun getUnlearnedWords(): List<Word> = words.filter { !it.isLearned }
     

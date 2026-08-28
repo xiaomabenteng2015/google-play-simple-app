@@ -133,8 +133,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStartLearning"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginTop="24dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/start_learning"
                 android:textSize="18sp"
                 app:cornerRadius="16dp"
@@ -144,8 +144,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnWordList"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/word_list"
                 android:textSize="18sp"
                 app:backgroundTint="@color/secondary_color"
@@ -156,14 +156,27 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReview"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/review_learned"
                 android:textSize="18sp"
                 app:backgroundTint="@color/accent_color"
                 app:cornerRadius="16dp"
                 app:icon="@drawable/ic_review"
                 app:iconGravity="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVoiceInput"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/voice_input"
+                android:textSize="18sp"
+                app:backgroundTint="@color/primary_dark"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_voice_recording"
+                app:iconGravity="textStart"
+                app:iconTint="@null" />
 
         </LinearLayout>
 
