@@ -13,6 +13,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.en.teach.data.WordRepository
 import com.en.teach.databinding.ActivityVoiceInputBinding
 import com.en.teach.model.Word
@@ -47,6 +48,7 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         super.onCreate(savedInstanceState)
         binding = ActivityVoiceInputBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
         repository = WordRepository(applicationContext)
         applySystemBarInsets(binding.toolbarContainer, left = true, top = true, right = true)
@@ -155,14 +157,18 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
 
     override fun onReadyForSpeech(params: Bundle?) {
         binding.tvStatus.setText(R.string.voice_listening)
+        binding.tvStatusSupport.setText(R.string.voice_listening_hint)
     }
 
     override fun onBeginningOfSpeech() {
         binding.tvStatus.setText(R.string.voice_listening)
+        binding.tvStatusSupport.setText(R.string.voice_listening_hint)
     }
 
     override fun onEndOfSpeech() {
         binding.tvStatus.setText(R.string.voice_processing)
+        binding.tvStatusSupport.setText(R.string.voice_processing_hint)
+        binding.btnStartListening.setText(R.string.voice_processing)
         stopVoicePulse()
     }
 
@@ -220,16 +226,22 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         matchedWord = null
         stopVoicePulse()
         binding.tvStatus.setText(R.string.voice_tap_to_speak)
+        binding.tvStatusSupport.setText(R.string.voice_ready_hint)
         binding.btnStartListening.visibility = View.VISIBLE
         binding.btnStartListening.isEnabled = true
+        binding.btnStartListening.setText(R.string.voice_start_listening)
+        binding.idleExamplePanel.visibility = View.VISIBLE
         binding.resultCard.visibility = View.GONE
     }
 
     private fun renderListening() {
         startVoicePulse()
         binding.tvStatus.setText(R.string.voice_listening)
+        binding.tvStatusSupport.setText(R.string.voice_listening_hint)
         binding.btnStartListening.visibility = View.VISIBLE
         binding.btnStartListening.isEnabled = false
+        binding.btnStartListening.setText(R.string.voice_listening)
+        binding.idleExamplePanel.visibility = View.GONE
         binding.resultCard.visibility = View.GONE
     }
 
@@ -237,17 +249,20 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         matchedWord = word
         stopVoicePulse()
         binding.tvStatus.setText(R.string.voice_match_found)
+        binding.tvStatusSupport.setText(R.string.voice_match_hint)
         binding.btnStartListening.visibility = View.GONE
+        binding.idleExamplePanel.visibility = View.GONE
         binding.resultCard.visibility = View.VISIBLE
         binding.tvRecognizedText.visibility = View.VISIBLE
         binding.tvRecognizedText.text = getString(R.string.voice_heard, word.english)
+        binding.wordResultPanel.visibility = View.VISIBLE
         binding.wordDetails.visibility = View.VISIBLE
         binding.tvEnglishWord.text = word.english
         binding.tvPronunciation.text = word.pronunciation
         binding.tvChineseTranslation.text = word.chinese
         binding.tvExample.text = word.example
         binding.tvExampleTranslation.text = word.exampleTranslation
-        binding.tvNotMatched.visibility = View.GONE
+        binding.voiceFeedbackPanel.visibility = View.GONE
         binding.btnStudyWord.visibility = View.VISIBLE
     }
 
@@ -255,25 +270,37 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         matchedWord = null
         stopVoicePulse()
         binding.tvStatus.setText(R.string.voice_no_vocabulary_match)
+        binding.tvStatusSupport.setText(R.string.voice_no_vocabulary_hint)
         binding.btnStartListening.visibility = View.GONE
+        binding.idleExamplePanel.visibility = View.GONE
         binding.resultCard.visibility = View.VISIBLE
         binding.tvRecognizedText.visibility = View.VISIBLE
         binding.tvRecognizedText.text = getString(R.string.voice_heard, recognizedText)
+        binding.wordResultPanel.visibility = View.GONE
         binding.wordDetails.visibility = View.GONE
+        binding.voiceFeedbackPanel.visibility = View.VISIBLE
         binding.tvNotMatched.visibility = View.VISIBLE
+        binding.tvNotMatched.setText(R.string.voice_not_in_vocabulary)
         binding.btnStudyWord.visibility = View.GONE
+        binding.btnTryAgain.visibility = View.VISIBLE
     }
 
     private fun renderError(message: String) {
         matchedWord = null
         stopVoicePulse()
         binding.tvStatus.text = message
+        binding.tvStatusSupport.setText(R.string.voice_error_hint)
         binding.btnStartListening.visibility = View.GONE
+        binding.idleExamplePanel.visibility = View.GONE
         binding.resultCard.visibility = View.VISIBLE
         binding.tvRecognizedText.visibility = View.GONE
+        binding.wordResultPanel.visibility = View.GONE
         binding.wordDetails.visibility = View.GONE
-        binding.tvNotMatched.visibility = View.GONE
+        binding.voiceFeedbackPanel.visibility = View.VISIBLE
+        binding.tvNotMatched.visibility = View.VISIBLE
+        binding.tvNotMatched.setText(R.string.voice_error_hint)
         binding.btnStudyWord.visibility = View.GONE
+        binding.btnTryAgain.visibility = View.VISIBLE
     }
 
     private fun cancelListening() {
@@ -394,17 +421,17 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         private const val MAX_RESULTS = 5
         private const val VOICE_LEVEL_MIN_RMS_DB = -2f
         private const val VOICE_LEVEL_RMS_RANGE_DB = 12f
-        private const val VOICE_LEVEL_SMOOTHING_FACTOR = 0.45f
+        private const val VOICE_LEVEL_SMOOTHING_FACTOR = 0.55f
         private const val VOICE_PULSE_INNER_BASE_SCALE = 0.82f
         private const val VOICE_PULSE_OUTER_BASE_SCALE = 0.72f
-        private const val VOICE_PULSE_INNER_SCALE_RANGE = 0.24f
-        private const val VOICE_PULSE_OUTER_SCALE_RANGE = 0.39f
-        private const val VOICE_PULSE_INNER_BASE_ALPHA = 0.16f
-        private const val VOICE_PULSE_OUTER_BASE_ALPHA = 0.08f
-        private const val VOICE_PULSE_INNER_ALPHA_RANGE = 0.34f
-        private const val VOICE_PULSE_OUTER_ALPHA_RANGE = 0.24f
-        private const val VOICE_PULSE_AMBIENT_LEVEL = 0.06f
-        private const val VOICE_PULSE_AMBIENT_RANGE = 0.04f
-        private const val VOICE_PULSE_DURATION_MS = 760L
+        private const val VOICE_PULSE_INNER_SCALE_RANGE = 0.33f
+        private const val VOICE_PULSE_OUTER_SCALE_RANGE = 0.50f
+        private const val VOICE_PULSE_INNER_BASE_ALPHA = 0.30f
+        private const val VOICE_PULSE_OUTER_BASE_ALPHA = 0.18f
+        private const val VOICE_PULSE_INNER_ALPHA_RANGE = 0.48f
+        private const val VOICE_PULSE_OUTER_ALPHA_RANGE = 0.38f
+        private const val VOICE_PULSE_AMBIENT_LEVEL = 0.14f
+        private const val VOICE_PULSE_AMBIENT_RANGE = 0.10f
+        private const val VOICE_PULSE_DURATION_MS = 900L
     }
 }

@@ -20,4 +20,12 @@
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="white_alpha_70">#B3FFFFFF</color>
+
+    <!-- Voice input -->
+    <color name="voice_background">#F7F9FC</color>
+    <color name="voice_surface">#FFFFFFFF</color>
+    <color name="voice_border">#FFE3E8EF</color>
+    <color name="voice_primary_soft">#FFEAF3FF</color>
+    <color name="voice_primary_ring">#522196F3</color>
+    <color name="voice_primary_ring_soft">#242196F3</color>
 </resources>

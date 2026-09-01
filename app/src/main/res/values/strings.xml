@@ -55,16 +55,27 @@
     <string name="shortcut_voice_short_label">Voice Input</string>
 
     <!-- Voice input -->
-    <string name="voice_input_title">Voice Input</string>
+    <string name="voice_input_title">Voice input</string>
     <string name="voice_recording_icon_description">Voice input microphone</string>
-    <string name="voice_tap_to_speak">Tap the button and say one word from the vocabulary list.</string>
-    <string name="voice_start_listening">Start Listening</string>
+    <string name="voice_practice_label">Pronunciation practice</string>
+    <string name="voice_practice_title">Say a word</string>
+    <string name="voice_practice_description">Speak clearly. We’ll find the word in your vocabulary.</string>
+    <string name="voice_tap_to_speak">Ready to listen</string>
+    <string name="voice_ready_hint">Tap once, then say one English word</string>
+    <string name="voice_start_listening">Start listening</string>
     <string name="voice_listening">Listening…</string>
-    <string name="voice_processing">Processing…</string>
+    <string name="voice_listening_hint">Speak clearly at a natural volume</string>
+    <string name="voice_processing">Checking your word…</string>
+    <string name="voice_processing_hint">Matching your voice with the vocabulary</string>
     <string name="voice_match_found">Word found</string>
+    <string name="voice_match_hint">Review the match, then continue learning.</string>
     <string name="voice_heard">We heard: %1$s</string>
     <string name="voice_no_vocabulary_match">No vocabulary match</string>
+    <string name="voice_no_vocabulary_hint">Try another word from your vocabulary.</string>
     <string name="voice_not_in_vocabulary">This word is not in the current vocabulary.</string>
+    <string name="voice_error_hint">Check your microphone or connection, then try again.</string>
+    <string name="voice_example_label">Try saying</string>
+    <string name="voice_example_word">“apple”</string>
     <string name="voice_study_word">Study This Word</string>
     <string name="voice_try_again">Try Again</string>
     <string name="voice_permission_denied">Microphone permission is required for voice input.</string>

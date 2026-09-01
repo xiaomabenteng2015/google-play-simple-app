@@ -21,6 +21,22 @@ import org.robolectric.annotation.Config
 class VoiceInputActivityTest {
 
     @Test
+    fun idleStateShowsPracticeContextAndExample() {
+        val activity = Robolectric.buildActivity(VoiceInputActivity::class.java).setup().get()
+
+        assertEquals(
+            "Say a word",
+            activity.findRequiredTextView("tvPracticeTitle").text.toString()
+        )
+        assertEquals(View.VISIBLE, activity.findRequiredView("idleExamplePanel").visibility)
+        assertEquals(View.GONE, activity.findRequiredView("voiceFeedbackPanel").visibility)
+        assertEquals(
+            "Ready to listen",
+            activity.findViewById<TextView>(R.id.tvStatus).text.toString()
+        )
+    }
+
+    @Test
     fun recognitionResultShowsMatchedWordAndOpensSingleWordStudy() {
         val activity = createListeningActivity()
 
@@ -55,12 +71,27 @@ class VoiceInputActivityTest {
 
         assertEquals(View.VISIBLE, innerPulse.visibility)
         assertEquals(View.VISIBLE, outerPulse.visibility)
+        assertEquals(View.GONE, activity.findRequiredView("idleExamplePanel").visibility)
+        assertEquals(
+            "Listening…",
+            activity.findViewById<TextView>(R.id.btnStartListening).text.toString()
+        )
 
         activity.onRmsChanged(-2f)
+        val quietInnerScale = innerPulse.scaleX
         val quietOuterScale = outerPulse.scaleX
-        activity.onRmsChanged(10f)
+        assertTrue(innerPulse.alpha >= 0.25f)
+        assertTrue(outerPulse.alpha >= 0.15f)
 
-        assertTrue(outerPulse.scaleX > quietOuterScale)
+        repeat(4) {
+            activity.onRmsChanged(10f)
+        }
+
+        assertTrue(innerPulse.scaleX - quietInnerScale >= 0.23f)
+        assertTrue(outerPulse.scaleX - quietOuterScale >= 0.38f)
+        assertTrue(innerPulse.alpha >= 0.65f)
+        assertTrue(outerPulse.alpha >= 0.42f)
+        assertTrue(outerPulse.scaleX > innerPulse.scaleX)
         assertTrue(innerPulse.alpha > outerPulse.alpha)
     }
 
@@ -79,6 +110,25 @@ class VoiceInputActivityTest {
         assertEquals(View.INVISIBLE, outerPulse.visibility)
         assertEquals(VOICE_PULSE_INNER_BASE_SCALE, innerPulse.scaleX, 0.0001f)
         assertEquals(VOICE_PULSE_OUTER_BASE_SCALE, outerPulse.scaleX, 0.0001f)
+        assertEquals(
+            "Checking your word…",
+            activity.findViewById<TextView>(R.id.tvStatus).text.toString()
+        )
+    }
+
+    @Test
+    fun errorStateShowsCompactFeedbackWithRetryAction() {
+        val activity = Robolectric.buildActivity(VoiceInputActivity::class.java).setup().get()
+
+        VoiceInputActivity::class.java.getDeclaredMethod("renderError", String::class.java).apply {
+            isAccessible = true
+            invoke(activity, "Speech recognition failed. Please try again.")
+        }
+
+        assertEquals(View.VISIBLE, activity.findRequiredView("voiceFeedbackPanel").visibility)
+        assertEquals(View.VISIBLE, activity.findViewById<View>(R.id.btnTryAgain).visibility)
+        assertEquals(View.GONE, activity.findRequiredView("wordResultPanel").visibility)
+        assertEquals(View.GONE, activity.findRequiredView("idleExamplePanel").visibility)
     }
 
     private fun createListeningActivity(renderListening: Boolean = false): VoiceInputActivity {
@@ -101,6 +151,9 @@ class VoiceInputActivityTest {
         assertNotEquals("Missing view id: $resourceName", 0, resourceId)
         return findViewById(resourceId)
     }
+
+    private fun VoiceInputActivity.findRequiredTextView(resourceName: String): TextView =
+        findRequiredView(resourceName) as TextView
 
     private fun recognitionResults(vararg candidates: String) = Bundle().apply {
         putStringArrayList(

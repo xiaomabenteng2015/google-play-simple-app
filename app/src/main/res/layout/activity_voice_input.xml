@@ -5,14 +5,14 @@
     android:id="@+id/voiceInputRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
+    android:background="@color/voice_background"
     tools:context=".VoiceInputActivity">
 
     <LinearLayout
         android:id="@+id/toolbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary_color"
+        android:background="@color/voice_surface"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -20,9 +20,14 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_back"
+            app:navigationIcon="@drawable/ic_back_dark"
             app:title="@string/voice_input_title"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="@color/text_primary" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/voice_border" />
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -39,20 +44,56 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="32dp">
+
+            <LinearLayout
+                android:id="@+id/voiceIntroBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/voice_practice_label"
+                    android:textColor="@color/primary_color"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPracticeTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/voice_practice_title"
+                    android:textColor="@color/text_primary"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/voice_practice_description"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
             <FrameLayout
-                android:layout_width="168dp"
-                android:layout_height="168dp"
+                android:layout_width="match_parent"
+                android:layout_height="190dp"
+                android:layout_marginTop="12dp"
                 android:clipChildren="false"
                 android:clipToPadding="false">
 
                 <View
                     android:id="@+id/voicePulseOuter"
-                    android:layout_width="148dp"
-                    android:layout_height="148dp"
+                    android:layout_width="154dp"
+                    android:layout_height="154dp"
                     android:layout_gravity="center"
                     android:alpha="0"
                     android:background="@drawable/bg_voice_pulse_ring"
@@ -60,13 +101,13 @@
                     android:scaleX="0.72"
                     android:scaleY="0.72"
                     android:visibility="invisible"
-                    tools:alpha="0.22"
+                    tools:alpha="0.2"
                     tools:visibility="visible" />
 
                 <View
                     android:id="@+id/voicePulseInner"
-                    android:layout_width="126dp"
-                    android:layout_height="126dp"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
                     android:layout_gravity="center"
                     android:alpha="0"
                     android:background="@drawable/bg_voice_pulse_ring"
@@ -74,65 +115,125 @@
                     android:scaleX="0.82"
                     android:scaleY="0.82"
                     android:visibility="invisible"
-                    tools:alpha="0.38"
+                    tools:alpha="0.34"
                     tools:visibility="visible" />
 
                 <ImageView
-                    android:layout_width="104dp"
-                    android:layout_height="104dp"
+                    android:id="@+id/voiceMicButton"
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
                     android:layout_gravity="center"
+                    android:background="@drawable/bg_voice_mic_button"
                     android:contentDescription="@string/voice_recording_icon_description"
-                    android:src="@drawable/ic_voice_recording" />
+                    android:elevation="8dp"
+                    android:padding="26dp"
+                    android:src="@drawable/ic_mic_white" />
             </FrameLayout>
 
             <TextView
                 android:id="@+id/tvStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:gravity="center"
                 android:textColor="@color/text_primary"
-                android:textSize="18sp"
-                tools:text="Tap the button and say one word." />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="Ready to listen" />
+
+            <TextView
+                android:id="@+id/tvStatusSupport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                tools:text="Tap once, then say one English word" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStartListening"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="22dp"
                 android:text="@string/voice_start_listening"
                 android:textSize="16sp"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="8dp"
+                app:icon="@drawable/ic_mic_white"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconSize="20dp" />
 
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
+                android:id="@+id/idleExamplePanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_voice_info_panel"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="42dp"
+                    android:background="@color/secondary_color" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/voice_example_label"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/voice_example_word"
+                        android:textColor="@color/text_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/resultCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
                 android:visibility="gone"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
                 tools:visibility="visible">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvRecognizedText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    tools:text="We heard: apple" />
+
+                <LinearLayout
+                    android:id="@+id/wordResultPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_voice_info_panel"
                     android:orientation="vertical"
                     android:padding="20dp">
-
-                    <TextView
-                        android:id="@+id/tvRecognizedText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp"
-                        tools:text="We heard: apple" />
 
                     <LinearLayout
                         android:id="@+id/wordDetails"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
@@ -141,7 +242,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/text_primary"
-                            android:textSize="36sp"
+                            android:textSize="34sp"
                             android:textStyle="bold"
                             tools:text="apple" />
 
@@ -151,16 +252,16 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textColor="@color/text_secondary"
-                            android:textSize="17sp"
+                            android:textSize="16sp"
                             tools:text="/ˈæpl/" />
 
                         <TextView
                             android:id="@+id/tvChineseTranslation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="14dp"
                             android:textColor="@color/primary_color"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             tools:text="苹果" />
 
@@ -186,38 +287,47 @@
                             tools:text="我每天吃一个苹果。" />
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvNotMatched"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:gravity="center"
-                        android:text="@string/voice_not_in_vocabulary"
-                        android:textColor="@color/error_color"
-                        android:textSize="16sp"
-                        android:visibility="gone"
-                        tools:visibility="visible" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnStudyWord"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="20dp"
                         android:text="@string/voice_study_word"
                         android:textSize="16sp"
-                        app:cornerRadius="12dp" />
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/voiceFeedbackPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_voice_info_panel"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/tvNotMatched"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/voice_not_in_vocabulary"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="15sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnTryAgain"
                         style="@style/Widget.Material3.Button.OutlinedButton"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:text="@string/voice_try_again"
                         android:textSize="16sp"
-                        app:cornerRadius="12dp" />
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
