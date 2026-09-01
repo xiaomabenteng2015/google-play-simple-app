@@ -124,8 +124,11 @@
                     android:layout_height="88dp"
                     android:layout_gravity="center"
                     android:background="@drawable/bg_voice_mic_button"
+                    android:clickable="true"
                     android:contentDescription="@string/voice_recording_icon_description"
                     android:elevation="8dp"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:padding="26dp"
                     android:src="@drawable/ic_mic_white" />
             </FrameLayout>

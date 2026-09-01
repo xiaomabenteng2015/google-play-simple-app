@@ -44,6 +44,13 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         }
     }
 
+    private val studyWordLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        // 学习流程返回后自动复位，方便用户继续识别下一个单词
+        renderIdle()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVoiceInputBinding.inflate(layoutInflater)
@@ -61,13 +68,23 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.btnStartListening.setOnClickListener { requestListening() }
         binding.btnTryAgain.setOnClickListener { requestListening() }
+        binding.voiceMicButton.setOnClickListener { onMicButtonClicked() }
         binding.btnStudyWord.setOnClickListener {
             matchedWord?.let { word ->
-                startActivity(
+                studyWordLauncher.launch(
                     Intent(this, LearningActivity::class.java)
                         .putExtra(LearningActivity.EXTRA_WORD_ID, word.id)
                 )
             }
+        }
+    }
+
+    private fun onMicButtonClicked() {
+        if (isListening) {
+            cancelListening()
+            renderIdle()
+        } else {
+            requestListening()
         }
     }
 
@@ -230,6 +247,7 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         binding.btnStartListening.visibility = View.VISIBLE
         binding.btnStartListening.isEnabled = true
         binding.btnStartListening.setText(R.string.voice_start_listening)
+        binding.voiceMicButton.contentDescription = getString(R.string.voice_recording_icon_description)
         binding.idleExamplePanel.visibility = View.VISIBLE
         binding.resultCard.visibility = View.GONE
     }
@@ -241,6 +259,7 @@ class VoiceInputActivity : BaseActivity(), RecognitionListener {
         binding.btnStartListening.visibility = View.VISIBLE
         binding.btnStartListening.isEnabled = false
         binding.btnStartListening.setText(R.string.voice_listening)
+        binding.voiceMicButton.contentDescription = getString(R.string.voice_recording_icon_description_stop)
         binding.idleExamplePanel.visibility = View.GONE
         binding.resultCard.visibility = View.GONE
     }

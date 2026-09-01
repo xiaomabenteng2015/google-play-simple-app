@@ -57,6 +57,7 @@
     <!-- Voice input -->
     <string name="voice_input_title">Voice input</string>
     <string name="voice_recording_icon_description">Voice input microphone</string>
+    <string name="voice_recording_icon_description_stop">Stop listening</string>
     <string name="voice_practice_label">Pronunciation practice</string>
     <string name="voice_practice_title">Say a word</string>
     <string name="voice_practice_description">Speak clearly. We’ll find the word in your vocabulary.</string>
