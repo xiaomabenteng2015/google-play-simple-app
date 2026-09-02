@@ -254,9 +254,17 @@ class WordRepository(private val context: Context) {
     // 获取需要加强练习的单词
     fun getWordsNeedingPractice(): List<Word> {
         return words.filter { word ->
-            word.isLearned && 
-            (word.incorrectAnswers > word.correctAnswers || 
+            word.isLearned &&
+            (word.incorrectAnswers > word.correctAnswers ||
              word.difficultyLevel == DifficultyLevel.HARD)
         }
+    }
+
+    // 清除所有本地学习数据，恢复到初始状态
+    fun resetAllData() {
+        preferencesManager.clearAllData()
+        words.clear()
+        initializeWords()
+        saveWords()
     }
 }

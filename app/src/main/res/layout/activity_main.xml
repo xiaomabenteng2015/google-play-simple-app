@@ -282,6 +282,7 @@
 
     <!-- Progress Section -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/progressCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -325,6 +326,17 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnClearData"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/clear_learning_data"
+        android:textColor="@color/error_color"
+        app:layout_constraintTop_toBottomOf="@id/progressCard" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

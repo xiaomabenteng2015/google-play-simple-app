@@ -65,6 +65,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun forceRefreshData() {
         refreshData()
     }
+
+    // 清除本地所有学习数据，恢复到初始状态
+    fun clearAllData() {
+        com.en.teach.data.WordRepository(getApplication()).resetAllData()
+        refreshData()
+    }
     
     fun refreshData() {
         android.util.Log.d("MainViewModel", "refreshData called")

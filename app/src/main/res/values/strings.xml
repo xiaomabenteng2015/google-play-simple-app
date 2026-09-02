@@ -86,4 +86,12 @@
     <string name="voice_recognizer_busy">Speech recognition is busy. Please wait and try again.</string>
     <string name="voice_recognition_failed">Speech recognition failed. Please try again.</string>
 
+    <!-- Data management -->
+    <string name="clear_learning_data">Clear Learning Data</string>
+    <string name="clear_learning_data_confirm_title">Clear all learning data?</string>
+    <string name="clear_learning_data_confirm_message">This deletes all saved progress, statistics and session history stored on this device. This cannot be undone.</string>
+    <string name="clear_learning_data_confirm_positive">Clear</string>
+    <string name="clear_learning_data_confirm_negative">Cancel</string>
+    <string name="clear_learning_data_done">Learning data cleared</string>
+
 </resources>

@@ -126,4 +126,20 @@ class LearningDataRegressionTest {
         assertEquals(true, viewModel.isFinished.value)
         assertEquals(null, viewModel.currentWord.value)
     }
+
+    @Test
+    fun resetAllDataClearsProgressAndRestoresBuiltInWords() {
+        val repository = WordRepository(application)
+        repository.markWordAsLearned(1, DifficultyLevel.MASTERED)
+        repository.updateLearningProgress(wordsLearned = 1, studyTime = 1_000L)
+
+        repository.resetAllData()
+
+        val reloaded = WordRepository(application)
+        assertEquals(100, reloaded.getAllWords().size)
+        assertTrue(reloaded.getLearnedWords().isEmpty())
+        val progress = PreferencesManager(application).loadLearningProgress()
+        assertEquals(0, progress.currentStreak)
+        assertEquals("", progress.lastStudyDate)
+    }
 }

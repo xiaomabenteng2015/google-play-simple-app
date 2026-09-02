@@ -61,6 +61,20 @@ class MainActivity : BaseActivity() {
                 android.widget.Toast.makeText(this, "No words need review right now", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.btnClearData.setOnClickListener { confirmClearData() }
+    }
+
+    private fun confirmClearData() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.clear_learning_data_confirm_title)
+            .setMessage(R.string.clear_learning_data_confirm_message)
+            .setPositiveButton(R.string.clear_learning_data_confirm_positive) { _, _ ->
+                viewModel.clearAllData()
+                android.widget.Toast.makeText(this, R.string.clear_learning_data_done, android.widget.Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.clear_learning_data_confirm_negative, null)
+            .show()
     }
     
     private fun observeViewModel() {

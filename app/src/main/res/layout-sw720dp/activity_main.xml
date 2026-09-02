@@ -178,6 +178,15 @@
                 app:iconGravity="textStart"
                 app:iconTint="@null" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearData"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/clear_learning_data"
+                android:textColor="@color/error_color" />
+
         </LinearLayout>
 
         <!-- Right Pane: Progress -->
